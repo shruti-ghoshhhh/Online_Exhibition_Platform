@@ -89,5 +89,36 @@ class DatabaseSeeder extends Seeder
         Artwork::create(['exhibition_id' => $exh3->id, 'user_id' => $artist->id, 'artist_name' => 'Alex Chen', 'views' => 190, 'title' => 'Neon Vines', 'description' => 'Glowing flora overtaking the system.', 'image_path' => 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&q=80']);
         Artwork::create(['exhibition_id' => $exh3->id, 'user_id' => $artist->id, 'artist_name' => 'Alex Chen', 'views' => 130, 'title' => 'Glass Leaves', 'description' => 'Fragile digital foliage.', 'image_path' => 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80']);
         Artwork::create(['exhibition_id' => $exh3->id, 'user_id' => $artist->id, 'artist_name' => 'Alex Chen', 'views' => 270, 'title' => 'Synthetic Roots', 'description' => 'The foundation of the digital forest.', 'image_path' => 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=80']);
+
+        // Generate mock Engagement (Likes & Comments) over the last 7 days so charts aren't empty
+        $allArtworks = Artwork::all();
+        $sampleComments = ['Amazing work!', 'Love the composition.', 'Stunning detail!', 'Absolutely beautiful.', 'Incredible color palette.', 'This speaks to me.'];
+
+        foreach ($allArtworks as $art) {
+            for ($i = 0; $i < rand(2, 6); $i++) {
+                $randomDate = \Carbon\Carbon::now()->subDays(rand(0, 6));
+                
+                \App\Models\Like::create([
+                    'user_id' => $visitor->id,
+                    'artwork_id' => $art->id,
+                    'created_at' => $randomDate,
+                    'updated_at' => $randomDate
+                ]);
+
+                if (rand(1, 100) > 40) { // 60% chance to also leave a comment
+                    \App\Models\Comment::create([
+                        'user_id' => $visitor->id,
+                        'artwork_id' => $art->id,
+                        'comment' => $sampleComments[array_rand($sampleComments)],
+                        'created_at' => $randomDate,
+                        'updated_at' => $randomDate
+                    ]);
+                }
+            }
+        }
+
+        // Add Registrations
+        \App\Models\Registration::create(['user_id' => $visitor->id, 'exhibition_id' => $exh1->id]);
+        \App\Models\Registration::create(['user_id' => $visitor->id, 'exhibition_id' => $exh2->id]);
     }
 }

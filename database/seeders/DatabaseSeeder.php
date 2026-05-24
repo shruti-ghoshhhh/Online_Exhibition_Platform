@@ -100,7 +100,8 @@ class DatabaseSeeder extends Seeder
                 
                 \App\Models\Like::create([
                     'user_id' => $visitor->id,
-                    'artwork_id' => $art->id,
+                    'likeable_id' => $art->id,
+                    'likeable_type' => \App\Models\Artwork::class,
                     'created_at' => $randomDate,
                     'updated_at' => $randomDate
                 ]);
@@ -109,7 +110,7 @@ class DatabaseSeeder extends Seeder
                     \App\Models\Comment::create([
                         'user_id' => $visitor->id,
                         'artwork_id' => $art->id,
-                        'comment' => $sampleComments[array_rand($sampleComments)],
+                        'body' => $sampleComments[array_rand($sampleComments)],
                         'created_at' => $randomDate,
                         'updated_at' => $randomDate
                     ]);

@@ -93,13 +93,19 @@ class DatabaseSeeder extends Seeder
         // Generate mock Engagement (Likes & Comments) over the last 7 days so charts aren't empty
         $allArtworks = Artwork::all();
         $sampleComments = ['Amazing work!', 'Love the composition.', 'Stunning detail!', 'Absolutely beautiful.', 'Incredible color palette.', 'This speaks to me.'];
+        $userIds = [$admin->id, $artist->id, $visitor->id];
 
         foreach ($allArtworks as $art) {
-            for ($i = 0; $i < rand(2, 6); $i++) {
+            $numLikers = rand(1, 3);
+            $shuffledUsers = $userIds;
+            shuffle($shuffledUsers);
+            $likers = array_slice($shuffledUsers, 0, $numLikers);
+
+            foreach ($likers as $uid) {
                 $randomDate = \Carbon\Carbon::now()->subDays(rand(0, 6));
                 
                 \App\Models\Like::create([
-                    'user_id' => $visitor->id,
+                    'user_id' => $uid,
                     'likeable_id' => $art->id,
                     'likeable_type' => \App\Models\Artwork::class,
                     'created_at' => $randomDate,
@@ -108,7 +114,7 @@ class DatabaseSeeder extends Seeder
 
                 if (rand(1, 100) > 40) { // 60% chance to also leave a comment
                     \App\Models\Comment::create([
-                        'user_id' => $visitor->id,
+                        'user_id' => $uid,
                         'artwork_id' => $art->id,
                         'body' => $sampleComments[array_rand($sampleComments)],
                         'created_at' => $randomDate,
